@@ -1,6 +1,3 @@
-
-
-
 class Generator(object):
   # the Generator object is used to generate a given number of objects, the
   # object being generated must have a __name__ attribute.
