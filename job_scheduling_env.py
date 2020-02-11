@@ -192,6 +192,7 @@ class SchedulingEnv(object):
     self._num_io_jobs = [0] * num_servers
     self._total_cpu_intensity = [0] * num_servers
     self._total_io_intensity = [0] * num_servers
+    self._policies = ['random', 'bestfit', 'earlist', 'round_robin', 'sensible']
     if init_template:
       if (len(init_template["job"]) == num_jobs and
           len(init_template["server"]) == num_servers ):
@@ -314,15 +315,15 @@ class SchedulingEnv(object):
     return len(self._servers_status[sid]["job_info_que"])
 
   def _scheduling_logger(self, sid, job):
-    if job.get_type == 'CPU':
+    if job.get_type() == 'CPU':
       self._total_cpu_intensity[sid] += job.get_intensity()
-      self._total_cpu_intensity[sid] += job.get_intensity()
+      self._num_cpu_jobs[sid] += 1
     else:
-      self._total_io_intensity[sid] += job.get_intensity()
+      self._num_io_jobs[sid] += 1
       self._total_io_intensity[sid] += job.get_intensity()
     self._scheduling_recorder[sid] += 1
 
-  def allocale_job_to(self, sid):
+  def allocate_job_to(self, sid):
     current_job = self._jobs.popleft()
     self._scheduling_logger(sid, current_job)
     status = self._servers_status[sid]
@@ -379,6 +380,9 @@ class SchedulingEnv(object):
           self._num_finished_jobs += 1
         else:
           break
+
+  def get_server_ids(self):
+    return list(range(self._num_servers))
 
   def average_response_time(self, time_span=None):
     if time_span:
@@ -438,6 +442,43 @@ class SchedulingEnv(object):
                          / watching_jobs)
     return avg_dc_t
 
+  def allocate_simulate(self, 
+                        jobin_speed, 
+                        num_jobs, 
+                        time_span=None,
+                        method='random'):
+    # simulate the job allocation according to the given policy
+    if num_jobs > len(self._jobs):
+      raise ValueError("Currently only {} left, "
+                       "but required {} jobs to finish them simulation"
+                       .format(len(self._jobs), num_jobs)
+                       )
+    original_jobin_speed = self._scheduling_speed
+    time_past_each = 1 / jobin_speed
+    self._scheduling_speed = jobin_speed
+    policy_gen = self._buildin_policy(time_span)
+    if method == 'random':
+      policy = policy_gen.random_policy
+    elif method == 'bestfit':
+      policy = policy_gen.bestfit_policy
+    elif method == 'earlist':
+      policy = policy_gen.earlist_policy
+    elif method == 'round_robin':
+      policy = policy_gen.round_robin_policy
+    elif method == 'sensible':
+      policy = policy_gen.sensible_policy
+    else:
+      raise ValueError("The selected policy: {} is not supported, "
+                       "please choose in {}".format(method, self._policies)
+                       )
+    for i in range(num_jobs):
+      sid = policy()
+      self.allocate_job_to(sid)
+      self.simulate_time_past(time_past_each)
+
+      
+
+    
   def _reward_fn(self, wait_time, exec_time, finish_time):
     return exec_time / (wait_time + 0.00001)
 
