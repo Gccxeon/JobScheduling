@@ -323,8 +323,12 @@ class SchedulingEnv(object):
       self._total_io_intensity[sid] += job.get_intensity()
     self._scheduling_recorder[sid] += 1
 
+  def current_job(self):
+    return self._jobs[0]
+
   def allocate_job_to(self, sid):
     current_job = self._jobs.popleft()
+    job_type = current_job.get_type()
     self._scheduling_logger(sid, current_job)
     status = self._servers_status[sid]
     wait_time = self.expected_wait_times()[sid]
@@ -358,7 +362,18 @@ class SchedulingEnv(object):
                                self._servers_status[sid]["expected_idle_time"],
                                finish_time))
     reward = self._reward_fn(wait_time, exec_time, finish_time)
-    return sid, reward
+    return reward
+
+  def step(self, action):
+    current_job = self.current_job()
+    state = current_job.info()
+    state["response_time"] = self.expected_wait_times()
+    reward = self.allocate_job_to(action)
+    next_job = self.current_job()
+    next_state = next_job.info()
+    next_state["response_time"] = self.expected_wait_times()
+    return (state, action, reward, next_state)
+
 
   def simulate_time_past(self, time_span):
     self._clock += time_span
@@ -442,9 +457,9 @@ class SchedulingEnv(object):
                          / watching_jobs)
     return avg_dc_t
 
-  def allocate_simulate(self, 
-                        jobin_speed, 
-                        num_jobs, 
+  def allocate_simulate(self,
+                        jobin_speed,
+                        num_jobs,
                         time_span=None,
                         method='random'):
     # simulate the job allocation according to the given policy
@@ -476,9 +491,6 @@ class SchedulingEnv(object):
       self.allocate_job_to(sid)
       self.simulate_time_past(time_past_each)
 
-      
-
-    
   def _reward_fn(self, wait_time, exec_time, finish_time):
     return exec_time / (wait_time + 0.00001)
 
@@ -492,7 +504,7 @@ class SchedulingEnv(object):
       report.append({"Server id": sid,
                      "Choosed ratio": num_actions / num_total_actions})
     return report
-#def _buildin_policy(self, principle='random'):
+
 class BuildInPolicy():
   def __init__(self,
                scheduling_env,

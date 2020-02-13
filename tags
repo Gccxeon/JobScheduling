@@ -1,0 +1,131 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/a3c87ab5/
+BuildInPolicy	job_scheduling_env.py	/^class BuildInPolicy():$/;"	c
+Generator	job_scheduling_env.py	/^class Generator(object):$/;"	c
+Generator	utils.py	/^class Generator(object):$/;"	c
+Job	.ipynb_checkpoints/server_jobs-checkpoint.py	/^class Job(object):$/;"	c
+Job	job_scheduling_env.py	/^class Job(object):$/;"	c
+JobQueue	job_scheduling_env.py	/^class JobQueue(deque):$/;"	c
+SchedulingEnv	job_scheduling_env.py	/^class SchedulingEnv(object):$/;"	c
+Server	.ipynb_checkpoints/server_jobs-checkpoint.py	/^class Server(object):$/;"	c
+Server	job_scheduling_env.py	/^class Server(object):$/;"	c
+SimpleEmulator	job_scheduling_env.py	/^class SimpleEmulator(object):$/;"	c
+StatusRender	.ipynb_checkpoints/status_render-checkpoint.py	/^class StatusRender(object):$/;"	c
+StatusRender	status_render.py	/^class StatusRender(object):$/;"	c
+StatusReport	job_scheduling_env.py	/^class StatusReport():$/;"	c
+Transition	.ipynb_checkpoints/transition-checkpoint.py	/^class Transition(namedtuple):$/;"	c
+Transition	transition.py	/^class Transition():$/;"	c
+__getitem__	job_scheduling_env.py	/^  def __getitem__(self, key):$/;"	m	class:JobQueue
+__init__	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def __init__(self, cpu_power, io_power):$/;"	m	class:Server
+__init__	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def __init__(self, job_type, intensity):$/;"	m	class:Job
+__init__	.ipynb_checkpoints/status_render-checkpoint.py	/^  def __init__(self, scheduling_env):$/;"	m	class:StatusRender
+__init__	.ipynb_checkpoints/transition-checkpoint.py	/^    def __init__(self, current_state, action, reward, next_state):$/;"	m	class:Transition
+__init__	job_scheduling_env.py	/^  def __init__(self, cpu_power, io_power):$/;"	m	class:Server
+__init__	job_scheduling_env.py	/^  def __init__(self, iterable, maxlen):$/;"	m	class:JobQueue
+__init__	job_scheduling_env.py	/^  def __init__(self, object_prototype, init_params_range):$/;"	m	class:Generator
+__init__	job_scheduling_env.py	/^  def __init__(self, sid, server_type, cpu_power, io_power, queue_len, e_i_t,$/;"	m	class:StatusReport
+__init__	job_scheduling_env.py	/^  def __init__(self,$/;"	m	class:BuildInPolicy
+__init__	job_scheduling_env.py	/^  def __init__(self,$/;"	m	class:SchedulingEnv
+__init__	job_scheduling_env.py	/^  def __init__(self,job_type, intensity):$/;"	m	class:Job
+__init__	status_render.py	/^  def __init__(self, scheduling_env):$/;"	m	class:StatusRender
+__init__	utils.py	/^  def __init__(self, object_prototype, init_params_range):$/;"	m	class:Generator
+_buildin_policy	job_scheduling_env.py	/^  def _buildin_policy(self, time_span=None):$/;"	m	class:SchedulingEnv
+_get_job_type_num_from_status	job_scheduling_env.py	/^  def _get_job_type_num_from_status(self, status):$/;"	m	class:SchedulingEnv
+_get_server_origin	job_scheduling_env.py	/^  def _get_server_origin(self, sid):$/;"	m	class:SchedulingEnv
+_get_title	.ipynb_checkpoints/status_render-checkpoint.py	/^  def _get_title(self, title_text):$/;"	m	class:StatusRender
+_get_title	status_render.py	/^  def _get_title(self, title_text):$/;"	m	class:StatusRender
+_get_x_style	.ipynb_checkpoints/status_render-checkpoint.py	/^  def _get_x_style(self, title_text):$/;"	m	class:StatusRender
+_get_x_style	status_render.py	/^  def _get_x_style(self, title_text):$/;"	m	class:StatusRender
+_make_avgres_fig	.ipynb_checkpoints/status_render-checkpoint.py	/^  def _make_avgres_fig(self):$/;"	m	class:StatusRender
+_make_avgres_fig	status_render.py	/^  def _make_avgres_fig(self):$/;"	m	class:StatusRender
+_make_job_fig	.ipynb_checkpoints/status_render-checkpoint.py	/^  def _make_job_fig(self):$/;"	m	class:StatusRender
+_make_job_fig	status_render.py	/^  def _make_job_fig(self):$/;"	m	class:StatusRender
+_num_queued_jobs	job_scheduling_env.py	/^  def _num_queued_jobs(self, sid):$/;"	m	class:SchedulingEnv
+_reward_fn	job_scheduling_env.py	/^  def _reward_fn(self, wait_time, exec_time, finish_time):$/;"	m	class:SchedulingEnv
+_scheduling_logger	job_scheduling_env.py	/^  def _scheduling_logger(self, sid, job):$/;"	m	class:SchedulingEnv
+_server_status_updater	job_scheduling_env.py	/^  def _server_status_updater(self):$/;"	m	class:SchedulingEnv
+_value_update	.ipynb_checkpoints/status_render-checkpoint.py	/^  def _value_update(self):$/;"	m	class:StatusRender
+_value_update	status_render.py	/^  def _value_update(self):$/;"	m	class:StatusRender
+allocate_job_to	job_scheduling_env.py	/^  def allocate_job_to(self, sid):$/;"	m	class:SchedulingEnv
+allocate_simulate	job_scheduling_env.py	/^  def allocate_simulate(self, $/;"	m	class:SchedulingEnv
+average_discounted_response	job_scheduling_env.py	/^  def average_discounted_response(self, time_span):$/;"	m	class:SchedulingEnv
+average_response_time	.ipynb_checkpoints/status_render-checkpoint.py	/^  def average_response_time(self):$/;"	m	class:StatusRender
+average_response_time	job_scheduling_env.py	/^  def average_response_time(self, time_span=None):$/;"	m	class:SchedulingEnv
+average_response_time	status_render.py	/^  def average_response_time(self):$/;"	m	class:StatusRender
+average_response_time_total	job_scheduling_env.py	/^  def average_response_time_total(self):$/;"	m	class:SchedulingEnv
+average_response_time_with_span	job_scheduling_env.py	/^  def average_response_time_with_span(self, time_span):$/;"	m	class:SchedulingEnv
+averge_response	.ipynb_checkpoints/status_render-checkpoint.py	/^  def averge_response(self):$/;"	m	class:StatusRender
+averge_response	status_render.py	/^  def averge_response(self):$/;"	m	class:StatusRender
+bestfit	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def bestfit(self, servers):$/;"	m	class:Job
+bestfit	job_scheduling_env.py	/^  def bestfit(self, servers):$/;"	m	class:Job
+bestfit_policy	job_scheduling_env.py	/^  def bestfit_policy(self):$/;"	m	class:BuildInPolicy
+build_params	job_scheduling_env.py	/^  def build_params(self, method='random'):$/;"	m	class:Generator
+build_params	utils.py	/^  def build_params(self,  method='random'):$/;"	m	class:Generator
+dcc	.ipynb_checkpoints/status_render-checkpoint.py	/^import dash_core_components as dcc$/;"	I
+dcc	status_render.py	/^import dash_core_components as dcc$/;"	I
+earlist_policy	job_scheduling_env.py	/^  def earlist_policy(self):$/;"	m	class:BuildInPolicy
+expected_finish_times	job_scheduling_env.py	/^  def expected_finish_times(self, job):$/;"	m	class:SchedulingEnv
+expected_wait_times	job_scheduling_env.py	/^  def expected_wait_times(self):$/;"	m	class:SchedulingEnv
+generate	job_scheduling_env.py	/^  def generate(self, num_to_generate, method='random'):$/;"	m	class:Generator
+generate	utils.py	/^  def generate(self, num_to_generate, method='random'):$/;"	m	class:Generator
+get	job_scheduling_env.py	/^    get = lambda x : x[-1]["cum_response_time"] if x else 0$/;"	f	member:SchedulingEnv.get_cum_response_time	file:
+get_cpu_power	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def get_cpu_power(self):$/;"	m	class:Server
+get_cpu_power	job_scheduling_env.py	/^  def get_cpu_power(self):$/;"	m	class:Server
+get_cum_response_time	job_scheduling_env.py	/^  def get_cum_response_time(self, sid_or_queue):$/;"	m	class:SchedulingEnv
+get_current_job	job_scheduling_env.py	/^  def get_current_job(self):$/;"	m	class:SchedulingEnv
+get_intensity	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def get_intensity(self):$/;"	m	class:Job
+get_intensity	job_scheduling_env.py	/^  def get_intensity(self):$/;"	m	class:Job
+get_io_power	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def get_io_power(self):$/;"	m	class:Server
+get_io_power	job_scheduling_env.py	/^  def get_io_power(self):$/;"	m	class:Server
+get_job_info	job_scheduling_env.py	/^  def get_job_info(self):$/;"	m	class:SchedulingEnv
+get_num_jobs	job_scheduling_env.py	/^  def get_num_jobs(self):$/;"	m	class:SchedulingEnv
+get_overview	job_scheduling_env.py	/^  def get_overview(self, time_span):$/;"	m	class:SchedulingEnv
+get_server_ids	job_scheduling_env.py	/^  def get_server_ids(self):$/;"	m	class:SchedulingEnv
+get_server_info	job_scheduling_env.py	/^  def get_server_info(self, sid):$/;"	m	class:SchedulingEnv
+get_server_info_queue	job_scheduling_env.py	/^  def get_server_info_queue(self, sid):$/;"	m	class:SchedulingEnv
+get_server_status	job_scheduling_env.py	/^  def get_server_status(self):$/;"	m	class:SchedulingEnv
+get_status	job_scheduling_env.py	/^  def get_status(self):$/;"	m	class:StatusReport
+get_type	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def get_type(self):$/;"	m	class:Job
+get_type	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def get_type(self):$/;"	m	class:Server
+get_type	job_scheduling_env.py	/^  def get_type(self):$/;"	m	class:Job
+get_type	job_scheduling_env.py	/^  def get_type(self):$/;"	m	class:Server
+go	.ipynb_checkpoints/status_render-checkpoint.py	/^import plotly.graph_objs as go$/;"	I
+go	status_render.py	/^import plotly.graph_objs as go$/;"	I
+html	.ipynb_checkpoints/status_render-checkpoint.py	/^import dash_html_components as html$/;"	I
+html	status_render.py	/^import dash_html_components as html$/;"	I
+info	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def info(self):$/;"	m	class:Job
+info	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def info(self):$/;"	m	class:Server
+info	job_scheduling_env.py	/^  def info(self):$/;"	m	class:Job
+info	job_scheduling_env.py	/^  def info(self):$/;"	m	class:Server
+init_server_status	job_scheduling_env.py	/^  def init_server_status(self):$/;"	m	class:SchedulingEnv
+job_exec_times	job_scheduling_env.py	/^  def job_exec_times(self, job):$/;"	m	class:SchedulingEnv
+job_status	.ipynb_checkpoints/status_render-checkpoint.py	/^  def job_status(self):$/;"	m	class:StatusRender
+job_status	status_render.py	/^  def job_status(self):$/;"	m	class:StatusRender
+job_time_estimate	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def job_time_estimate(self, jobs):$/;"	m	class:Server
+job_time_estimate	job_scheduling_env.py	/^  def job_time_estimate(self, jobs):$/;"	m	class:Server
+jobs_in_servers	.ipynb_checkpoints/status_render-checkpoint.py	/^  def jobs_in_servers(self):$/;"	m	class:StatusRender
+jobs_in_servers	status_render.py	/^  def jobs_in_servers(self):$/;"	m	class:StatusRender
+np	job_scheduling_env.py	/^import numpy as np$/;"	I
+pio	.ipynb_checkpoints/status_render-checkpoint.py	/^import plotly.io as pio$/;"	I
+pio	status_render.py	/^import plotly.io as pio$/;"	I
+pop_current_job	job_scheduling_env.py	/^  def pop_current_job(self):$/;"	m	class:SchedulingEnv
+random_policy	job_scheduling_env.py	/^  def random_policy(self):$/;"	m	class:BuildInPolicy
+refresh_avgres_fig	.ipynb_checkpoints/status_render-checkpoint.py	/^  def refresh_avgres_fig(self):$/;"	m	class:StatusRender
+refresh_avgres_fig	status_render.py	/^  def refresh_avgres_fig(self):$/;"	m	class:StatusRender
+refresh_job_fig	.ipynb_checkpoints/status_render-checkpoint.py	/^  def refresh_job_fig(self):$/;"	m	class:StatusRender
+refresh_job_fig	status_render.py	/^  def refresh_job_fig(self):$/;"	m	class:StatusRender
+reset	job_scheduling_env.py	/^  def reset(self):$/;"	m	class:SchedulingEnv
+round_robin_policy	job_scheduling_env.py	/^  def round_robin_policy(self):$/;"	m	class:BuildInPolicy
+scheduling_report	job_scheduling_env.py	/^  def scheduling_report(self):$/;"	m	class:SchedulingEnv
+sensible_policy	job_scheduling_env.py	/^  def sensible_policy(self):$/;"	m	class:BuildInPolicy
+server_time_estimate	.ipynb_checkpoints/server_jobs-checkpoint.py	/^  def server_time_estimate(self, servers):$/;"	m	class:Job
+server_time_estimate	job_scheduling_env.py	/^  def server_time_estimate(self, servers):$/;"	m	class:Job
+simulate_time_past	job_scheduling_env.py	/^  def simulate_time_past(self, time_span):$/;"	m	class:SchedulingEnv
+test	.ipynb_checkpoints/status_render-checkpoint.py	/^  def test(self):$/;"	m	class:StatusRender
+test	status_render.py	/^  def test(self):$/;"	m	class:StatusRender
