@@ -5,6 +5,7 @@ from collections import deque
 from utils import Collector
 from policy import Policy
 from postprocessor import PostProcessor
+from status_render import StatusRender
 
 import torchvision.transforms as T
 import torch
@@ -45,3 +46,8 @@ def recollect(num):
 def gather_test(dim, index):
   sample = get_some_tensor_states(10)
   return sample.gather(dim, index)
+
+# status render test
+render = StatusRender(env)
+def render_test():
+  return render.job_status()

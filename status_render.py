@@ -28,8 +28,6 @@ class StatusRender(object):
     self._make_avgres_fig()
 
 
-
-
   def _get_title(self, title_text):
     title = self._title_style
     title['text'] = title_text
