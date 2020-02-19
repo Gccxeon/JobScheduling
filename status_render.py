@@ -2,14 +2,11 @@ from plotly.offline import plot, iplot
 from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 import plotly.io as pio
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
 
 class StatusRender(object):
-# A helper obejct used to print the statistical/status info in the job 
+# A helper obejct used to print the statistical/status info in the job
 # scheduling process.
- 
+
   def __init__(self, scheduling_env):
 
     self._env = scheduling_env
@@ -23,7 +20,7 @@ class StatusRender(object):
                       color="#f00000")
 
     self._x_style = {'tickmode': 'linear'}
-    self._value_update()                     
+    self._value_update()
     self._make_job_fig()
     self._make_avgres_fig()
 
@@ -44,16 +41,16 @@ class StatusRender(object):
 
     job_fig = make_subplots(rows=1, cols=2)
 
-    job_fig.add_trace(go.Bar(x=self._sids, y=self._cpu_jobs, 
+    job_fig.add_trace(go.Bar(x=self._sids, y=self._cpu_jobs,
                              name="CPU intensive jobs"),
                   row=1, col=1)
-    job_fig.add_trace(go.Bar(x=self._sids, y=self._io_jobs, 
+    job_fig.add_trace(go.Bar(x=self._sids, y=self._io_jobs,
                              name="IO intensive jobs"),
                   row=1, col=1)
-    job_fig.add_trace(go.Bar(x=self._sids, y=self._cpu_ints, 
+    job_fig.add_trace(go.Bar(x=self._sids, y=self._cpu_ints,
                              name="CPU intensities"),
                   row=1, col=2)
-    job_fig.add_trace(go.Bar(x=self._sids, y=self._io_ints, 
+    job_fig.add_trace(go.Bar(x=self._sids, y=self._io_ints,
                              name="IO intensities"),
                   row=1, col=2)
     job_fig.update_layout(title=self._get_title(title),
@@ -67,7 +64,7 @@ class StatusRender(object):
     self._bar_job_iij = self._job_figure.data[1]
     self._bar_job_ci = self._job_figure.data[2]
     self._bar_job_ii = self._job_figure.data[3]
- 
+
   def _make_avgres_fig(self):
     fig = go.Figure()
     fig.add_trace(go.Bar(x=self._sids,
@@ -86,13 +83,13 @@ class StatusRender(object):
 
   def job_status(self):
     return self._job_figure
-  
+
 
   def averge_response(self):
     return self._avgres_fig
 
   def jobs_in_servers(self):
-    # print the number of jobs in each type and their intensity arranged by 
+    # print the number of jobs in each type and their intensity arranged by
     # each server's job queue
     self._value_update()
     self._job_figure.show()
@@ -117,11 +114,11 @@ class StatusRender(object):
     self._bar_job_iij.y = self._io_jobs
     self._bar_job_ci.y = self._cpu_ints
     self._bar_job_ii.y= self._io_ints
- 
+
   def refresh_avgres_fig(self):
     self._value_update()
     self._bar_avgres.y = self._avg_resp
-    
+
   def test(self):
     fig = {
     "data": [{"type": "bar",

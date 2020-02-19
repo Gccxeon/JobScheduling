@@ -40,8 +40,9 @@ class DqnNet(nn.Module):
     self._in_features = input_dim
     self._batch_size = batch_size
     self._out_features = action_space
-    self._model = nn.Sequential()
-    self._last_linear = None
+    self._conv_net = nn.Sequential()
+    self._fc_net = nn.Sequential()
+    self._rnn_net = nn.Sequential()
 
 
     if conv_network_param:
@@ -55,25 +56,23 @@ class DqnNet(nn.Module):
         activations = activations * len(args)
       i = 0
       self._check_if_same_len(conv_names, args, kw_args, activations)
-      self._conv = True
       self._conv_in_channel = args[0][0]
       for conv_name, args, kw_args, activation in zip(
           conv_names, args, kw_args, activations):
         name = "convolution_" + str(i)
         ac_name = "conv_" + activation + "_" + str(i)
         if kw_args:
-          self._model.add_module(name, getattr(nn, conv_name)(*args, **kw_args))
+          self._conv_net.add_module(name,
+                                    getattr(nn, conv_name)(*args, **kw_args))
         else:
-          self._model.add_module(name, getattr(nn, conv_name)(*args))
-        self._model.add_module(ac_name, getattr(nn, activation)())
+          self._conv_net.add_module(name, getattr(nn, conv_name)(*args))
+        self._conv_net.add_module(ac_name, getattr(nn, activation)())
         i += 1
-    else:
-      self. _conv = False
 
-    if self._model:
+    if self._conv_net:
       pseudo_in = torch.rand(batch_size, self._conv_in_channel, input_dim)
-      pseudo_out = self._model.forward(pseudo_in)
-      input_dim = pseudo_out.data.view(1,-1).size(1)
+      pseudo_out = self._conv_net.forward(pseudo_in)
+      input_dim = pseudo_out.data.view(batch_size,-1).size(1)
 
 
     if fc_network_param:
@@ -89,17 +88,17 @@ class DqnNet(nn.Module):
       for unit, bias, activation in zip(units, bias, activations):
         name = "fully_connected_" + str(i)
         ac_name = "fc_" + "activation" + "_" + str(i)
-        self._model.add_module(name, nn.Linear(input_dim, unit, bias=bias))
-        self._model.add_module(ac_name, getattr(nn, activation)())
+        self._fc_net.add_module(name, nn.Linear(input_dim, unit, bias=bias))
+        self._fc_net.add_module(ac_name, getattr(nn, activation)())
         input_dim = unit
         i += 1
 
-    self._model.add_module("final",
+    self._fc_net.add_module("final",
         nn.Linear(input_dim, self._out_features, bias=True))
 
 
     if rnn_network_param:
-      # do this later
+      # TODO
       pass
 
 
@@ -121,4 +120,8 @@ class DqnNet(nn.Module):
     return conv_names
 
   def forward(self, input):
-    return self._model.forward(input)
+    input = self._conv_net.forward(input) if self._conv_net else input
+    input = input.view(self._batch_size, -1)
+    input = self._fc_net.forward(input) if self._fc_net else input
+    # TODO: add rnn layer support
+    return input
