@@ -71,6 +71,7 @@ class DqnAgent(self):
         q_policy_next = reward + self._discount * logits
         q_difference = q_policy - q_policy_next
         loss = self._loss_fn(q_difference)
+        # TODO determine what kind operation should be workded on
 
   def _init_wieght(self, net):
     def init_w(m):
@@ -92,4 +93,5 @@ class DqnAgent(self):
     logits = self._policy_net.forward(state)
     _, actions = torch.max(logits, axis=1)
     return actions
+
 
