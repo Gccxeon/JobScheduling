@@ -1,83 +1,82 @@
+import math
 import copy
 import torch
 import torch.nn as nn
+import torch.optim as optim
 import numpy
 
-class DqnAgent(self):
+class DqnAgent():
   """
   A reinforcement learning agent used for job scheduling environment
   """
   def __init__(self,
                environment,
-               preprocessor,
                network,
                batch_size,
                loss_fn,
                optimizer,
-               replay_buffer,
-               epoch,
-               iteration,
-               discount=0.9,
+               discount=0.98,
                update_tau=0.5,
                update_period=30,
                learning_rate=1e-3,
                eps_greedy=0.9,
-               eps_decay=200):
+               eps_decay_count=200,
+               eps_minimum=0.1,
+               clip_grad=True):
 
     self._env = environment
-    self._preprocessor = preprocessor
+    self._batch_size = batch_size
 
     self._policy_net = network
     self._target_net = copy.deepcopy(self._policy_net)
     self._init_wieght(self._policy_net)
     self._init_wieght(self._target_net)
 
-    self._optimizer = optimizer
+    self._optimizer = self._get_optim(optimizer, learning_rate)
     self._loss_fn = loss_fn
-    self._replay_buffer = replay_buffer
-    self._epoch = epoch
-    self._iteration = iteration
     self._discount = discount
     self._update_tau = update_tau
     self._update_period = update_period
     self._eps_greedy = eps_greedy
-    self._eps_decay = eps_decay
-    self._lr = learning_rate
+    self._eps_minimum = eps_minimum
+    self._eps_decay = math.log(eps_minimum) / (eps_decay_count * eps_greedy)
+    self._clip_grad = clip_grad
+    self._global_step = 0
+
+    self._loss = None
 
 
-
-  def unpack(self, transition):
-    state, action, reward, next_state = transition
-    return state, action, reward, next_state
-
-  def get_input_from_sample(self):
-    state, action, reward, next_state, terminal = (
-        self._replay_buffer.sample(batch_size))
-    state_p = self._preprocessor('state', state)
-    reward = self._preprocessor('reward', reward)
-    next_state_p =self._preprocessor('state',next_state)
-
-    # Check if the any of the states are in the terminal state
-
-    return (state_p, action, reward, next_state_p, terminal)
-
-
-
-  def train(self)
+  def train_step(self, sample):
     """
     Args:
-      iteration: The training cicle
+      sample: The processed, directly usable sample that hasattr(sample, (
+          "state", "action", "reward", "next_state_nt", "nt_mask")). The
+          attribute "next_state_nt" means next_state(s) that are not terminal,
+          and the "nt_mask" attribute gives a indexing mask that can be used
+          on torch tensor indicating non-terminal states.
     """
-    for i in range(self._epoch):
-      for i in range(self._iteration):
-        state, action, reward, next_step = self.get_input()
-        q_policy = self._net(state)
-        _, actions = torch.max(q_policy, axis=1)
-        # Here some work needs to be done in order to support batch training
+    state, action, reward, next_state_nt, nt_mask = sample
+    state_values = self._policy_net(state)
 
-        q_difference = q_policy - q_policy_next
-        loss = self._loss_fn(q_difference)
-        # TODO determine what kind operation should be workded on
+    # Compute the state_action values from the samples
+    q_values = state_values.gather(1, action)
+    target_q_values = torch.zeros(self._batch_size)
+    target_state_values = self._target_net(next_state_nt).detach()
+    target_q_values[nt_mask] = (
+        self._discount * target_state_values.max(1)[0] + reward[nt_mask])
+
+    loss = self._loss_fn(q_values, target_q_values.unsqueeze(1))
+    self._loss = loss
+    self._optimizer.zero_grad()
+    loss.backward()
+    if self._clip_grad == True:
+      for params in self._policy_net.parameters():
+       params.grad.data.clamp_(-1,1)
+    self._optimizer.step()
+    self._global_step += 1
+    if not self._global_step % self._update_period:
+      self._soft_update()
+
 
   def _init_wieght(self, net):
     def init_w(m):
@@ -87,17 +86,38 @@ class DqnAgent(self):
 
 
   def _eps_policy(self, state):
+    self._eps_greedy = max(self._eps_greedy ** self._eps_decay,
+                           self._eps_minimum)
     if self._eps_greedy < torch.rand(1)[0]:
       return self._random_action()
     else:
+      # Only one state is supported
       return self.predict(state)
 
   def _random_action(self):
-    return torch.randint(0, self._action_space, (self._batch_size,))
+    return torch.randint(0, self._action_space, 1).view(1,1)
 
   def predict(self, state):
-    logits = self._policy_net.forward(state)
-    _, actions = torch.max(logits, axis=1)
-    return actions
+    with torch.no_grad():
+      action = self._policy_net(state).max(1)[1].view(1,1)
+      return action
 
+  def default_policy(self, state):
+    return self._eps_policy(state).flatten()
 
+  def _get_optim(self, optimizer, lr):
+    if optimizer == "Adam":
+      return optim.Adam(self._policy_net.parameters(), lr=lr)
+    else:
+      return optim.SGD(self._policy_net.parameters(), lr=lr, momentum=0.9)
+
+  def _soft_update(self):
+    for param_p, param_t in zip(self._policy_net.parameters(),
+                                self._target_net.parameters()):
+      param_t = self._update_tau * param_p + (1 - self._update_tau) * param_t
+
+  def batch_size(self):
+    return self._batch_size
+
+  def loss(self):
+    return self._loss

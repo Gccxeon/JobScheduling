@@ -212,6 +212,8 @@ class SchedulingEnv(object):
     self._template = {"job": self._jobs, "server": self._servers}
     # wrap jobs as deque object
     self._jobs = deque(self._jobs, num_jobs)
+    self._terminal = False
+    self._cum_reward = 0.
 
 
   def reset(self):
@@ -332,6 +334,7 @@ class SchedulingEnv(object):
     # Check if in terminal state
     next_job = self.current_job()
     if next_job is None:
+      self._terminal = True
       reward = 0.0
       return reward
     job_type = current_job.get_type()
@@ -372,6 +375,7 @@ class SchedulingEnv(object):
                                self._servers_status[sid]["expected_idle_time"],
                                finish_time))
     reward = self._reward_fn(wait_time, exec_time, finish_time)
+    self._cum_reward += reward
 
     return reward
 
@@ -529,6 +533,12 @@ class SchedulingEnv(object):
       report.append({"Server id": sid,
                      "Choosed ratio": num_actions / num_total_actions})
     return report
+
+  def is_terminal(self):
+    return self._terminal
+
+  def cum_reward(self):
+    return self._cum_reward
 
 class BuildInPolicy():
   def __init__(self,

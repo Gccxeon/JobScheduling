@@ -53,16 +53,16 @@ class Collector():
                policy):
     """
     Args:
-      env: The environment that gives out the records. Must support the 'step()'
-        function;
-      record_type: the type of individual record. This will keep the data type
-        in the final collection consistent;
-      saver: The object used to store the records. Must support the 'add'
+      env: The environment that gives out the transitions. Must support the
+      'step()' function;
+      date_type: the type of individual transition. This will keep the data
+        type in the final collection consistent;
+      saver: The object used to store the transitions. Must support the 'add'
         function.
-      size: The amount of records needed to collect;
-      policy: The policy that will be used to collect the records. The policy
-        must has an 'action' function that will return the legit action when
-        called.
+      size: The amount of transitions needed to collect;
+      policy: The policy that will be used to collect the transitions. The
+        policy must has an 'action' function that will return the legit action
+        when called.
     """
 
     self._env = env
@@ -81,15 +81,20 @@ class Collector():
       # Get raw data from env
       unprocessed = self._env.step(action)
       # Process the transition
-      record = self._processor(*unprocessed)
-      self._record_check(record)
-      record = self._postprocessor.process(record)
-      self._saver.add(record)
+      transition = self._processor(*unprocessed)
+      self._transition_check(transition)
+      transition = self._postprocessor.process(transition)
+      self._saver.add(transition)
+
+  def collect_single_t(self, transition):
+    transition = self._processor(*transition)
+    self._transition_check(transition)
+    transition = self._postprocessor.process(transition)
+    self._saver.add(transition)
 
 
-  def _record_check(self, record):
-    if type(record) != self._data_type:
-      raise TypeError("The give record type doesn't match the requirement. "
-                      "Required {}, got {}."
-                      .format(self._data_type, record))
+  def _transition_check(self, transition):
+    if type(transition) != self._data_type:
+      raise TypeError("The given transition type doesn't match the requirement. "
+                      "Required {}, got {}.".format(self._data_type, transition))
 

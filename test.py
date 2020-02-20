@@ -10,7 +10,7 @@ from status_render import StatusRender
 import torchvision.transforms as T
 import torch
 
-num_jobs = 10000
+num_jobs = 5000
 num_servers = 10
 scheduling_speed = 35
 response_time_discount = 0.99
@@ -23,7 +23,7 @@ env = SchedulingEnv(num_jobs, num_servers, job_params, server_params,
                          scheduling_speed, response_time_discount)
 
 policy = Policy(env._buildin_policy().random_policy)
-replay_memory = ReplayMemory(Transition, 20)
+replay_memory = ReplayMemory(Transition, 800)
 
 collector = Collector(env,
                       Transition,
@@ -36,7 +36,7 @@ collector = Collector(env,
 # Convert to torch tensor test
 def get_some_tensor_states(batch_size):
   batch_sample = Transition(*zip(*replay_memory.sample(batch_size)))
-  bt_sample = torch.tensor(batch_sample.state)
+  bt_sample = batch_sample.state
   return bt_sample
 
 

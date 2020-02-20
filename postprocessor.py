@@ -1,4 +1,4 @@
-from torchvision import transforms
+import torch
 
 class PostProcessor():
   # A clas for preprocessing the state reperesentations
@@ -22,10 +22,14 @@ class PostProcessor():
     return state_array
 
   def process(self, transition):
-    state = self.state_process(transition.state)
-    action = transition.action
-    reward = transition.reward
-    next_state = self.state_process(transition.next_state)
+    state = torch.tensor(self.state_process(transition.state)).unsqueeze(0)
+    action = torch.tensor(transition.action).unsqueeze(0)
+    reward = torch.tensor(transition.reward).unsqueeze(0)
+    if transition.terminal:
+      next_state = None
+    else:
+      next_state = (
+          torch.tensor(self.state_process(transition.next_state)).unsqueeze(0))
     terminal = transition.terminal
     return type(transition)(state, action, reward, next_state, terminal)
 

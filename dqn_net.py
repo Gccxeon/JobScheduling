@@ -10,7 +10,6 @@ class DqnNet(nn.Module):
   """
   def __init__(self,
                input_dim,
-               batch_size,
                action_space,
                fc_network_param=None,
                conv_network_param=None,
@@ -38,7 +37,6 @@ class DqnNet(nn.Module):
     super(DqnNet, self).__init__()
 
     self._in_features = input_dim
-    self._batch_size = batch_size
     self._out_features = action_space
     self._conv_net = nn.Sequential()
     self._fc_net = nn.Sequential()
@@ -70,10 +68,11 @@ class DqnNet(nn.Module):
         i += 1
 
     if self._conv_net:
-      pseudo_in = torch.rand(batch_size, self._conv_in_channel, input_dim)
+      pseudo_in = torch.rand(1, self._conv_in_channel, input_dim)
       pseudo_out = self._conv_net.forward(pseudo_in)
-      input_dim = pseudo_out.data.view(batch_size,-1).size(1)
+      input_dim = pseudo_out.data.view(1, -1).size(1)
 
+    self._fc_in_dim = input_dim
 
     if fc_network_param:
       units = fc_network_param["units"]
@@ -118,8 +117,9 @@ class DqnNet(nn.Module):
     return conv_names
 
   def forward(self, input):
-    input = self._conv_net.forward(input) if self._conv_net else input
-    input = input.view(self._batch_size, -1)
-    input = self._fc_net.forward(input) if self._fc_net else input
+    if self._conv_net:
+      input = input.view(-1, self._conv_in_channel, self._in_features)
+      input = self._conv_net.forward(input)
+    input = self._fc_net.forward(input.view(-1, self._fc_in_dim))
     # TODO: add rnn layer support
     return input

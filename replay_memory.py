@@ -33,3 +33,6 @@ class ReplayMemory():
                       .format(self._data_type, type(transition)))
     self._data.append(transition)
     self._size = min(self._size + 1, self._max_capacity)
+
+  def __len__(self):
+    return len(self._data)
