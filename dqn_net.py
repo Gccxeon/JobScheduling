@@ -111,9 +111,7 @@ class DqnNet(nn.Module):
 
 
   def _get_conv_name(self, dims):
-    name_dict = {1: 'Conv1d',
-                  2: 'Conv2d',
-                  3: 'Conv3d'}
+    name_dict = {1: 'Conv1d', 2: 'Conv2d', 3: 'Conv3d'}
     conv_names = []
     for dim in dims:
       conv_names.append(name_dict[dim])
