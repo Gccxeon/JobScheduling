@@ -77,7 +77,10 @@ class Collector():
   def collect(self, sample_size):
     for i in range(sample_size):
       action = self._policy.action()
+
+      # Get raw data from env
       unprocessed = self._env.step(action)
+      # Process the transition
       record = self._processor(*unprocessed)
       self._record_check(record)
       record = self._postprocessor.process(record)

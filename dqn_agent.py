@@ -50,11 +50,16 @@ class DqnAgent(self):
     state, action, reward, next_state = transition
     return state, action, reward, next_state
 
-  def get_input(self):
-    state, action, reward, next_state = self._replay_buffer.sample(batch_size)
-    state_p = self._preprocessor(state)
-    next_state_p =self._preprocessor(next_state)
-    return (state_p, action, reward, next_state_p)
+  def get_input_from_sample(self):
+    state, action, reward, next_state, terminal = (
+        self._replay_buffer.sample(batch_size))
+    state_p = self._preprocessor('state', state)
+    reward = self._preprocessor('reward', reward)
+    next_state_p =self._preprocessor('state',next_state)
+
+    # Check if the any of the states are in the terminal state
+
+    return (state_p, action, reward, next_state_p, terminal)
 
 
 
@@ -68,7 +73,8 @@ class DqnAgent(self):
         state, action, reward, next_step = self.get_input()
         q_policy = self._net(state)
         _, actions = torch.max(q_policy, axis=1)
-        q_policy_next = reward + self._discount * logits
+        # Here some work needs to be done in order to support batch training
+
         q_difference = q_policy - q_policy_next
         loss = self._loss_fn(q_difference)
         # TODO determine what kind operation should be workded on

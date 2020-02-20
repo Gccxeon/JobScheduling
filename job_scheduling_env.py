@@ -324,14 +324,21 @@ class SchedulingEnv(object):
     self._scheduling_recorder[sid] += 1
 
   def current_job(self):
-    return self._jobs[0]
+    return self._jobs[0] if self._jobs else None
 
   def allocate_job_to(self, sid):
     current_job = self._jobs.popleft()
+
+    # Check if in terminal state
+    next_job = self.current_job()
+    if next_job is None:
+      reward = 0.0
+      return reward
     job_type = current_job.get_type()
     self._scheduling_logger(sid, current_job)
     status = self._servers_status[sid]
     wait_time = self.expected_wait_times()[sid]
+
     if self._num_queued_jobs(sid) < 1:
       discounted_wait_time = wait_time
       cum_response_time = wait_time
@@ -341,19 +348,22 @@ class SchedulingEnv(object):
       discounted_wait_time = wait_time + (self._response_time_discount
                                           * last_dwt)
       cum_response_time = last_crt + wait_time
+
     exec_time = self.job_exec_times(current_job)[sid]
     finish_time = self.expected_finish_times(current_job)[sid]
+
     self._servers_status[sid]["job_info_que"].append(
         {"job": current_job, "response_time": wait_time,
          "cum_response_time": cum_response_time,
          "cum_discounted_response_time": discounted_wait_time,
-         "finish_time": finish_time}
-        )
+         "finish_time": finish_time})
     last_idle_time = self._servers_status[sid]["expected_idle_time"]
+
     if last_idle_time < self._clock:
       last_idle_time = self._clock
-    self._servers_status[sid]["expected_idle_time"] = (last_idle_time +
-                                                             exec_time)
+    self._servers_status[sid]["expected_idle_time"] = (
+        last_idle_time + exec_time)
+
     if (finish_time - self._servers_status[sid]["expected_idle_time"]
             > 0.00000001):
       raise ValueError("Mismatching finish_time and expected_idle_time at "
@@ -362,17 +372,32 @@ class SchedulingEnv(object):
                                self._servers_status[sid]["expected_idle_time"],
                                finish_time))
     reward = self._reward_fn(wait_time, exec_time, finish_time)
+
     return reward
 
   def step(self, action):
+
+    terminal = False
     current_job = self.current_job()
+
+    # Handle the impossible situation
+    if current_job is None:
+      return (None, None, None, None, True)
+
     state = current_job.info()
     state["response_time"] = self.expected_wait_times()
     reward = self.allocate_job_to(action)
     next_job = self.current_job()
-    next_state = next_job.info()
-    next_state["response_time"] = self.expected_wait_times()
-    return (state, action, reward, next_state)
+
+    # Handle the terminal situation
+    if next_job:
+      next_state = next_job.info()
+      next_state["response_time"] = self.expected_wait_times()
+    else:
+      next_state = None
+      terminal = True
+
+    return (state, action, reward, next_state, terminal)
 
 
   def simulate_time_past(self, time_span):

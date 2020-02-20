@@ -12,6 +12,8 @@ class PostProcessor():
     self._type_rep = str2num_dict
 
   def state_process(self, state):
+    if state is None:
+      return None
     job_type = state['type']
     intensity = state['intensity']
     response_time = state['response_time']
@@ -24,7 +26,8 @@ class PostProcessor():
     action = transition.action
     reward = transition.reward
     next_state = self.state_process(transition.next_state)
-    return type(transition)(state, action, reward, next_state)
+    terminal = transition.terminal
+    return type(transition)(state, action, reward, next_state, terminal)
 
 
   def _type_to_number(self, type_name):

@@ -2,7 +2,7 @@ from collections import namedtuple
 import typing
 
 Transition = namedtuple("Transition",
-                        ("state", "action", "reward", "next_state"))
+                        ("state", "action", "reward", "next_state", "terminal"))
 
 
 #class Transition(transition):
