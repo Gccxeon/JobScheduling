@@ -11,6 +11,7 @@ class DqnAgent():
   """
   def __init__(self,
                environment,
+               preprocessor,
                network,
                batch_size,
                loss_fn,
@@ -25,6 +26,8 @@ class DqnAgent():
                clip_grad=True):
 
     self._env = environment
+    self._action_space = environment.action_space()
+    self._preprocessor = preprocessor
     self._batch_size = batch_size
 
     self._policy_net = network
@@ -39,7 +42,8 @@ class DqnAgent():
     self._update_period = update_period
     self._eps_greedy = eps_greedy
     self._eps_minimum = eps_minimum
-    self._eps_decay = math.log(eps_minimum) / (eps_decay_count * eps_greedy)
+    self._eps_decay =(
+        math.exp( math.log(eps_minimum / eps_greedy) / eps_decay_count))
     self._clip_grad = clip_grad
     self._global_step = 0
 
@@ -55,7 +59,7 @@ class DqnAgent():
           and the "nt_mask" attribute gives a indexing mask that can be used
           on torch tensor indicating non-terminal states.
     """
-    state, action, reward, next_state_nt, nt_mask = sample
+    state, action, reward, next_state_nt, nt_mask = self._preprocessor(sample)
     state_values = self._policy_net(state)
 
     # Compute the state_action values from the samples
@@ -86,23 +90,24 @@ class DqnAgent():
 
 
   def _eps_policy(self, state):
-    self._eps_greedy = max(self._eps_greedy ** self._eps_decay,
+    self._eps_greedy = max(self._eps_greedy * self._eps_decay,
                            self._eps_minimum)
-    if self._eps_greedy < torch.rand(1)[0]:
+    if self._eps_greedy > torch.rand(1)[0]:
       return self._random_action()
     else:
       # Only one state is supported
       return self.predict(state)
 
   def _random_action(self):
-    return torch.randint(0, self._action_space, 1).view(1,1)
+    return torch.randint(self._action_space, (1,)).view(1,1)
 
   def predict(self, state):
     with torch.no_grad():
       action = self._policy_net(state).max(1)[1].view(1,1)
       return action
 
-  def default_policy(self, state):
+  def default_policy(self, sample):
+    state = self._preprocessor(sample).state
     return self._eps_policy(state).flatten()
 
   def _get_optim(self, optimizer, lr):

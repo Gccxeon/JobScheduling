@@ -7,13 +7,15 @@ from collections import namedtuple
 from collections import deque
 from collections import Counter
 
+import reward_fn
+
 class Job(object):
   # A job class that denotes the job processed by the machine/server
   def __init__(self,job_type, intensity):
     """
       Args:
         job_type: 'CPU' or 'IO', either it's CPU intensive or IO intensive;
-        intensity: the computational requirement of the job, for example,
+       intensity: the computational requirement of the job, for example,
             the average MIPS needed to accomplish the job.
     """
     if job_type not in ['CPU', 'IO']:
@@ -214,7 +216,10 @@ class SchedulingEnv(object):
     self._jobs = deque(self._jobs, num_jobs)
     self._terminal = False
     self._cum_reward = 0.
+    self._num_actions = num_servers
 
+  def action_space(self):
+    return self._num_actions
 
   def reset(self):
     self.__init__(self._num_jobs, self._num_servers, None, None,
@@ -340,7 +345,8 @@ class SchedulingEnv(object):
     job_type = current_job.get_type()
     self._scheduling_logger(sid, current_job)
     status = self._servers_status[sid]
-    wait_time = self.expected_wait_times()[sid]
+    wait_times = self.expected_wait_times()
+    wait_time = wait_times[sid]
 
     if self._num_queued_jobs(sid) < 1:
       discounted_wait_time = wait_time
@@ -374,7 +380,9 @@ class SchedulingEnv(object):
                        .format(sid,
                                self._servers_status[sid]["expected_idle_time"],
                                finish_time))
-    reward = self._reward_fn(wait_time, exec_time, finish_time)
+#    reward = self._reward_fn(wait_time, exec_time, finish_time)
+    reward = reward_fn.scaled_reward(
+        wait_times, wait_time, exec_time, finish_time)
     self._cum_reward += reward
 
     return reward

@@ -4,7 +4,7 @@ from replay_memory import ReplayMemory
 from collections import deque
 from utils import Collector
 from policy import Policy
-from postprocessor import PostProcessor
+from samplizer import Samplizer
 from status_render import StatusRender
 
 import torchvision.transforms as T
@@ -15,7 +15,7 @@ num_servers = 10
 scheduling_speed = 35
 response_time_discount = 0.99
 str2num_dict = {'CPU':1, 'IO': -1}
-postprocessor = PostProcessor(str2num_dict)
+samplizer_ = Samplizer(str2num_dict)
 
 job_params = {'job_type':['CPU', 'IO'], 'intensity':(800, 1000)}
 server_params = {'cpu_power':(800, 1222), 'io_power':(500, 1500)}
@@ -27,7 +27,7 @@ replay_memory = ReplayMemory(Transition, 800)
 
 collector = Collector(env,
                       Transition,
-                      postprocessor,
+                      samplizer_,
                       Transition,
                       replay_memory,
                       50, policy)

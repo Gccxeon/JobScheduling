@@ -1,7 +1,7 @@
 import torch
 
-class PostProcessor():
-  # A clas for preprocessing the state reperesentations
+class Samplizer():
+  # A class for preprocessing the state reperesentations
   def __init__(self,
                str2num_dict):
     """

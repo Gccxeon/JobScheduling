@@ -45,8 +45,8 @@ class Collector():
   """
   def __init__(self,
                env,
-               processor,
-               postprocessor,
+               transitionizer,
+               samplizer,
                data_type,
                saver,
                size,
@@ -66,8 +66,8 @@ class Collector():
     """
 
     self._env = env
-    self._processor = processor
-    self._postprocessor = postprocessor
+    self._transitionizer = transitionizer
+    self._samplizer = samplizer
     self._data_type = data_type
     self._saver = saver
     self._policy = policy
@@ -81,15 +81,15 @@ class Collector():
       # Get raw data from env
       unprocessed = self._env.step(action)
       # Process the transition
-      transition = self._processor(*unprocessed)
+      transition = self._transitionizer(*unprocessed)
       self._transition_check(transition)
-      transition = self._postprocessor.process(transition)
+      transition = self._samplizer.process(transition)
       self._saver.add(transition)
 
   def collect_single_t(self, transition):
-    transition = self._processor(*transition)
+    transition = self._transitionizer(*transition)
     self._transition_check(transition)
-    transition = self._postprocessor.process(transition)
+    transition = self._samplizer.process(transition)
     self._saver.add(transition)
 
 

@@ -1,12 +1,12 @@
 from dqn_net import DqnNet
 from dqn_agent import DqnAgent
-from test import env, replay_memory, collector
+from env_test import env, replay_memory, collector
 import torch.nn as nn
 from preprocess_dqn import process_from_replay_sample
-batch_size = 16
+batch_size = 4
 
 conv_para = {"conv_dim": [1],
-             "args": [[1,3,2]],
+             "args": [[1,10,3]],
              "kw_args": [None],
              "activation": ['ReLU']}
 fc_param = {"units": [32, 16], "bias": [True, True], "activation": ['ReLU']}
@@ -18,6 +18,7 @@ network = DqnNet(12, 10,
 loss_fn = nn.functional.smooth_l1_loss
 
 agent = DqnAgent(environment=env,
+                 preprocessor=process_from_replay_sample,
                  network=network,
                  batch_size=batch_size,
                  loss_fn=loss_fn,
@@ -27,10 +28,9 @@ agent = DqnAgent(environment=env,
                  update_period=30,
                  learning_rate=1e-3,
                  eps_greedy=0.9,
-                 eps_decay_count=20000,
+                 eps_decay_count=200000,
                  eps_minimum=0.1)
 
 raw_sample = replay_memory.sample(batch_size)
-sample = process_from_replay_sample(raw_sample)
 
 #agent.train_step(sample)

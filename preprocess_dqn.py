@@ -1,4 +1,5 @@
 import torch
+from torchvision import transforms
 from collections import namedtuple
 from transition import Transition
 
@@ -8,6 +9,9 @@ ProcessedTransition=namedtuple("ProcessedTransition", ("state",
                                                        "next_state_nt",
                                                        "nt_mask"))
 
+def normalize(t):
+  return (t - t.mean(1, keepdim=True)/(t.max(1, keepdim=True)[0] -
+                                       t.min(1, keepdim=True)[0]))
 
 def process_from_replay_sample(sample):
 
@@ -20,12 +24,12 @@ def process_from_replay_sample(sample):
   next_state = batch_transition.next_state
   terminal = batch_transition.terminal
 
-  state = torch.cat(state)
+  state = normalize(torch.cat(state))
   action = torch.cat(action).unsqueeze(1)
   reward = torch.cat(reward)
   next_state = [state for state in next_state if state is not None]
   if next_state:
-    next_state_nt = torch.cat(next_state)
+    next_state_nt = normalize(torch.cat(next_state))
   else:
     next_state_nt = None
   nt_mask = list(not(term) for term in terminal)
