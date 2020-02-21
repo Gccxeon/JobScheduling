@@ -112,9 +112,10 @@ class DqnAgent():
       return optim.SGD(self._policy_net.parameters(), lr=lr, momentum=0.9)
 
   def _soft_update(self):
-    for param_p, param_t in zip(self._policy_net.parameters(),
-                                self._target_net.parameters()):
-      param_t = self._update_tau * param_p + (1 - self._update_tau) * param_t
+    with torch.no_grad():
+      for param_p, param_t in zip(self._policy_net.parameters(),
+                                  self._target_net.parameters()):
+        param_t = self._update_tau * param_p + (1 - self._update_tau) * param_t
 
   def batch_size(self):
     return self._batch_size

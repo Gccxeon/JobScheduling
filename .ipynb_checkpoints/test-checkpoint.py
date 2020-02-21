@@ -10,7 +10,7 @@ from status_render import StatusRender
 import torchvision.transforms as T
 import torch
 
-num_jobs = 5000
+num_jobs = 500
 num_servers = 10
 scheduling_speed = 35
 response_time_discount = 0.99

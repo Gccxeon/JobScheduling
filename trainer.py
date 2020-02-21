@@ -38,7 +38,7 @@ class Trainer():
 
   def train(self):
     # start with a random action
-    action = self._replay_buffer.sample(1)[0].action
+    action = int(self._replay_buffer.sample(1)[0].action)
 
     for i in range(self._episodes):
       print("Episode {}, loss: {}, iterations: {}, cum_reward: {}".
@@ -52,11 +52,11 @@ class Trainer():
         raw_sample = self._replay_buffer.sample(self._batch_size)
         sample = self._preprocessor(raw_sample)
         self._agent.train_step(sample)
-        raw_transition = self._transition_type(*self._env.step(action))
-        raw_transition = self._postprocessor.process(raw_transition)
-        transition = self._preprocessor(raw_transition)
-        next_action = int(self._agent.default_policy(transition.state))
-        next_transion = self._env.step(next_action)
-        self._collector.collect_single_t(next_transion)
+        unprocessed = self._env.step(action)
+        raw_transition = self._transition_type(*unprocessed)
+        transition = self._postprocessor.process(raw_transition)
+        transition = self._preprocessor(transition)
+        action = int(self._agent.default_policy(transition.state))
+        self._collector.collect_single_t(unprocessed)
         self._global_step += 1
 

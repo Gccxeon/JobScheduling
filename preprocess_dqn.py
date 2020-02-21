@@ -20,11 +20,14 @@ def process_from_replay_sample(sample):
   next_state = batch_transition.next_state
   terminal = batch_transition.terminal
 
-
   state = torch.cat(state)
   action = torch.cat(action).unsqueeze(1)
   reward = torch.cat(reward)
-  next_state_nt = torch.cat([state for state in next_state if state is not None])
+  next_state = [state for state in next_state if state is not None]
+  if next_state:
+    next_state_nt = torch.cat(next_state)
+  else:
+    next_state_nt = None
   nt_mask = list(not(term) for term in terminal)
 
   return ProcessedTransition(state, action, reward, next_state_nt, nt_mask)
