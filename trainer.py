@@ -41,7 +41,7 @@ class Trainer():
 
     for i in range(episodes + 1):
       if i>0:
-        print("Episode {}, loss: {}, iterations: {}, cum_reward: {}".
+        print("Episode {:2d}, loss: {:3f}, iterations: {:5d}, cum_reward: {:3f}".
               format(i,
                      self._agent.loss(),
                      self._global_step,

@@ -22,14 +22,15 @@ class Samplizer():
     return state_array
 
   def process(self, transition):
-    state = torch.tensor(self.state_process(transition.state)).unsqueeze(0)
+    state = torch.tensor(self.state_process(transition.state)).unsqueeze(0)+0.1
     action = torch.tensor(transition.action).unsqueeze(0)
     reward = torch.tensor(transition.reward).unsqueeze(0)
     if transition.terminal:
       next_state = None
     else:
       next_state = (
-          torch.tensor(self.state_process(transition.next_state)).unsqueeze(0))
+          torch.tensor(self.state_process(transition.next_state)).unsqueeze(0)
+          + 0.01)
     terminal = transition.terminal
     return type(transition)(state, action, reward, next_state, terminal)
 

@@ -9,10 +9,13 @@ conv_para = {"conv_dim": [1],
              "args": [[1,10,3]],
              "kw_args": [None],
              "activation": ['ReLU']}
-fc_param = {"units": [32, 16], "bias": [True, True], "activation": ['ReLU']}
+
+fc_param = {"units": [320, 160, 64, 32, 20],
+            "bias": [True],
+            "activation": ['ReLU', 'ReLU', 'ReLU', 'ReLU', 'ReLU']}
 
 network = DqnNet(12, 10,
-                 conv_network_param=conv_para,
+                 conv_network_param=None,
                  fc_network_param=fc_param)
 
 loss_fn = nn.functional.smooth_l1_loss
@@ -23,11 +26,11 @@ agent = DqnAgent(environment=env,
                  batch_size=batch_size,
                  loss_fn=loss_fn,
                  optimizer='Adam',
-                 discount=0.98,
+                 discount=0.9,
                  update_tau=0.5,
                  update_period=30,
                  learning_rate=1e-3,
-                 eps_greedy=0.9,
+                 eps_greedy=0.98,
                  eps_decay_count=200000,
                  eps_minimum=0.1)
 

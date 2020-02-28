@@ -1,5 +1,6 @@
 # A job scheduling environment for allocate the jobs to machines
 import numpy as np
+import math
 import numbers
 import random
 import functools, operator
@@ -175,8 +176,12 @@ class SchedulingEnv(object):
     Args:
       num_jobs: the number of initial jobs to generate;
       num_servers: the number of servers to generate;
-      init_template: a dictionary type parameter that serve as the template
-          of all jobs and servers;
+      job_gen_params: The parameters used to generate the jobs;
+      server_gen_params: The parameters used to generate the servers;
+      scheduing_speed: Choose how many jobs will be sent to the servers in any
+          unit time(sec);
+      init_template: If you don't want the jobs and servers to be generated
+          refersh, provide the ready dict-array of jobs and servers;
       init_from_template: if True, the jobs and servers will initialize from
           init_tempalte.
     """
@@ -188,13 +193,19 @@ class SchedulingEnv(object):
     self._server_generator = Generator(Server, server_gen_params)
     self._init_template = None
     self._scheduling_speed = scheduing_speed
+    # this discount factor will be used in sensible policy
     self._response_time_discount = response_time_discount
+    # an array that records which job has been allocated to which server
     self._scheduling_recorder = [0] * num_servers
+    # number of cpu/io intensive jobs in each server
     self._num_cpu_jobs = [0] * num_servers
     self._num_io_jobs = [0] * num_servers
+    # the total computational intensities of cpu/io jobs in each server
     self._total_cpu_intensity = [0] * num_servers
     self._total_io_intensity = [0] * num_servers
+    # some build-in policies that are used as baseline performance estimation
     self._policies = ['random', 'bestfit', 'earlist', 'round_robin', 'sensible']
+
     if init_template:
       if (len(init_template["job"]) == num_jobs and
           len(init_template["server"]) == num_servers ):
@@ -207,14 +218,21 @@ class SchedulingEnv(object):
             ", the servers and jobs will be generated randomly")
       self._jobs = self._job_generator.generate(num_jobs)
       self._servers = self._server_generator.generate(num_servers)
+
     self._num_finished_jobs = 0
+    # number of finished jobs in each server's queue
     self._nfj_in_servers = [0] * num_servers
-    self._clock = 0. # the unit ms indicator of the running time
+    # the indicator of the running time(unit: ms)
+    self._clock = 0.
+    # initialize the states of the servers
     self.init_server_status()
+    # backup the current jobs and servers as they will be used in reset() func
     self._template = {"job": self._jobs, "server": self._servers}
-    # wrap jobs as deque object
+    # wrap jobs as deque array
     self._jobs = deque(self._jobs, num_jobs)
+    # the indicator of if the current step of env is the final step
     self._terminal = False
+    # the cummulative reward from the start of scheduing
     self._cum_reward = 0.
     self._num_actions = num_servers
 
@@ -233,12 +251,13 @@ class SchedulingEnv(object):
     if self._jobs:
       return self._jobs[0]
     else:
-      print("There is no unscheduled job lest")
+      print("There is no unscheduled job left")
       return None
 
   def pop_current_job(self):
     return self._jobs.popleft()
 
+  # return the execution/response time of the given on each server
   def job_exec_times(self, job):
     return job.server_time_estimate(self._servers)
 
@@ -275,8 +294,7 @@ class SchedulingEnv(object):
                                          self._servers[sid].get_io_power(),
                                          len(status["job_info_que"]),
                                          status["expected_idle_time"],
-                                         num_cpu_type, num_io_type)
-                            )
+                                         num_cpu_type, num_io_type))
     return status_reports
 
   def get_overview(self, time_span):
@@ -296,9 +314,7 @@ class SchedulingEnv(object):
     # also the expected response time
     wait_times = []
     for sid, status in enumerate(self._servers_status):
-      wait_times.append(max(status["expected_idle_time"] - self._clock,
-                            0)
-                       )
+      wait_times.append(max(status["expected_idle_time"] - self._clock, 0))
     return wait_times
 
   def expected_finish_times(self, job):
@@ -354,8 +370,7 @@ class SchedulingEnv(object):
     else:
       last_dwt = status["job_info_que"][-1]["cum_discounted_response_time"]
       last_crt = status["job_info_que"][-1]["cum_response_time"]
-      discounted_wait_time = wait_time + (self._response_time_discount
-                                          * last_dwt)
+      discounted_wait_time = wait_time + (self._response_time_discount * last_dwt)
       cum_response_time = last_crt + wait_time
 
     exec_time = self.job_exec_times(current_job)[sid]
@@ -394,6 +409,7 @@ class SchedulingEnv(object):
 
     # Handle the impossible situation
     if current_job is None:
+      terminal= True
       return (None, None, None, None, True)
 
     state = current_job.info()
@@ -408,6 +424,8 @@ class SchedulingEnv(object):
     else:
       next_state = None
       terminal = True
+    # it tooks 1 sec to receive the jobs numbered as self._scheduling_speed
+    self.simulate_time_past(1/self._scheduling_speed)
 
     return (state, action, reward, next_state, terminal)
 
@@ -503,8 +521,7 @@ class SchedulingEnv(object):
     if num_jobs > len(self._jobs):
       raise ValueError("Currently only {} left, "
                        "but required {} jobs to finish them simulation"
-                       .format(len(self._jobs), num_jobs)
-                       )
+                       .format(len(self._jobs), num_jobs))
     original_jobin_speed = self._scheduling_speed
     time_past_each = 1 / jobin_speed
     self._scheduling_speed = jobin_speed
@@ -521,8 +538,7 @@ class SchedulingEnv(object):
       policy = policy_gen.sensible_policy
     else:
       raise ValueError("The selected policy: {} is not supported, "
-                       "please choose in {}".format(method, self._policies)
-                       )
+                       "please choose in {}".format(method, self._policies))
     for i in range(num_jobs):
       sid = policy()
       self.allocate_job_to(sid)
@@ -531,7 +547,7 @@ class SchedulingEnv(object):
   def _reward_fn(self, wait_time, exec_time, finish_time):
     return exec_time / (wait_time + 0.00001)
 
-  def _buildin_policy(self, time_span=None):
+  def _buildin_policy(self, time_span=5):
     return BuildInPolicy(self, observation_span=time_span)
 
   def scheduling_report(self):
@@ -551,13 +567,11 @@ class SchedulingEnv(object):
 class BuildInPolicy():
   def __init__(self,
                scheduling_env,
-               observation_span=None,
-              ):
+               observation_span=5):
     self._scheduling_env = scheduling_env
     self._action_space = scheduling_env._num_servers
     self._action_counter = -1
     self._observation_span = observation_span
-
 
   def random_policy(self):
     return random.sample(range(self._action_space), 1)[0]
@@ -597,8 +611,7 @@ class BuildInPolicy():
 
   def sensible_policy(self):
     avg_response_time = (
-        self._scheduling_env.average_discounted_response(self._observation_span)
-        )
+        self._scheduling_env.average_discounted_response(self._observation_span))
     offset = max(avg_response_time)
     logits = -np.array(avg_response_time) + offset + 10
     probs = logits / sum(logits)

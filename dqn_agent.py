@@ -96,7 +96,7 @@ class DqnAgent():
       return self._random_action()
     else:
       # Only one state is supported
-      return self.predict(state)
+      return self.predict_by_t(state)
 
   def _random_action(self):
     return torch.randint(self._action_space, (1,)).view(1,1)
@@ -104,6 +104,11 @@ class DqnAgent():
   def predict(self, state):
     with torch.no_grad():
       action = self._policy_net(state).max(1)[1].view(1,1)
+      return action
+
+  def predict_by_t(self, state):
+    with torch.no_grad():
+      action = self._target_net(state).max(1)[1].view(1,1)
       return action
 
   def default_policy(self, sample):

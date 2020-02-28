@@ -10,8 +10,8 @@ ProcessedTransition=namedtuple("ProcessedTransition", ("state",
                                                        "nt_mask"))
 
 def normalize(t):
-  return (t - t.mean(1, keepdim=True)/(t.max(1, keepdim=True)[0] -
-                                       t.min(1, keepdim=True)[0]))
+  return ((t - t.mean(1, keepdim=True))/(t.max(1, keepdim=True)[0] -
+                                         t.min(1, keepdim=True)[0] + 0.01))
 
 def process_from_replay_sample(sample):
 

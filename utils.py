@@ -98,3 +98,15 @@ class Collector():
       raise TypeError("The given transition type doesn't match the requirement. "
                       "Required {}, got {}.".format(self._data_type, transition))
 
+def flatten21(arr):
+  flated_elements = []
+  def recur_get(item):
+    if hasattr(item, '__iter__'):
+      for ele in item:
+        recur_get(ele)
+    else:
+      flated_elements.append(item)
+  recur_get(arr)
+  if len(flated_elements)==1:
+    return flated_elements[0]
+  return flated_elements

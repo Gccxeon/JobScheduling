@@ -94,6 +94,7 @@ class DqnNet(nn.Module):
 
     self._fc_net.add_module("final",
         nn.Linear(input_dim, self._out_features, bias=True))
+    self._fc_net.add_module("filnal_ac", nn.Sigmoid())
 
 
     if rnn_network_param:

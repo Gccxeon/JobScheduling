@@ -22,6 +22,7 @@ server_params = {'cpu_power':(800, 1222), 'io_power':(500, 1500)}
 env = SchedulingEnv(num_jobs, num_servers, job_params, server_params,
                          scheduling_speed, response_time_discount)
 
+policies = env._buildin_policy()
 policy = Policy(env._buildin_policy().random_policy)
 replay_memory = ReplayMemory(Transition, 800)
 
