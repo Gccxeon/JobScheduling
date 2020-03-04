@@ -28,6 +28,8 @@ def process_from_replay_sample(sample):
   action = torch.cat(action).unsqueeze(1)
   reward = torch.cat(reward)
   next_state = [state for state in next_state if state is not None]
+
+  # cook the non-terminal next_state and its indexing mask
   if next_state:
     next_state_nt = normalize(torch.cat(next_state))
   else:

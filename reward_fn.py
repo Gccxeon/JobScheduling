@@ -11,5 +11,9 @@ def reward_v2(wait_times, wait_time, exec_time, finish_time):
   reward = -math.log(wait_time+0.01) - math.log(ds) - exec_time*3
   return reward
 
+# Simple penalted reward targeting the total wait time
+def reward_v3(wait_times, wait_time, exec_time, finish_time):
+  return -math.log(sum(wait_times) + 0.1)
+
 def scaled_reward(*args):
-  return reward_v2(*args)
+  return reward_v3(*args)
