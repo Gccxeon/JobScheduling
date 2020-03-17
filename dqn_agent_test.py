@@ -10,13 +10,15 @@ conv_para = {"conv_dim": [1],
              "kw_args": [None],
              "activation": ['ReLU']}
 
-fc_param = {"units": [320, 160, 64, 32, 20],
+fc_param_1 = {"units": [320, 160, 64, 32, 20],
             "bias": [True],
             "activation": ['ReLU', 'ReLU', 'ReLU', 'ReLU', 'ReLU']}
 
+fc_param_2 = {"units": [40,20], "bias": [False], "activation": ['ReLU']}
+
 network = DqnNet(12, 10,
                  conv_network_param=None,
-                 fc_network_param=fc_param)
+                 fc_network_param=fc_param_2)
 
 loss_fn = nn.functional.smooth_l1_loss
 

@@ -50,6 +50,7 @@ class DqnAgent():
     self._loss = None
 
 
+  # Performs training on one batch if called
   def train_step(self, sample):
     """
     Args:
@@ -115,6 +116,7 @@ class DqnAgent():
     state = self._preprocessor(sample).state
     return self._eps_policy(state).flatten()
 
+  # TODO: Support more optimizers
   def _get_optim(self, optimizer, lr):
     if optimizer == "Adam":
       return optim.Adam(self._policy_net.parameters(), lr=lr)

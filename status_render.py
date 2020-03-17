@@ -15,6 +15,7 @@ class StatusRender(object):
                          'xanchor': 'center',
                          'yanchor': 'top'}
     self._sids = scheduling_env.get_server_ids()
+    self._types = list(self._env.server_type_info().values())
     self._font = dict(family="Courier New, monospace",
                       size=14,
                       color="#f00000")
@@ -79,6 +80,28 @@ class StatusRender(object):
 
     self._bar_avgres = self._avgres_fig.data[0]
 
+
+
+  # Render the server infomation
+  def server_info(self):
+    c_p = self._env.server_cpu_power()
+    i_p = self._env.server_io_power()
+    types = self._types
+    info = []
+    for single_info in zip(types ,c_p, i_p):
+      info.append(list(single_info))
+
+    fig = go.Figure()
+    fig.add_trace(go.Table(header=dict(values=['ID', *self._sids],
+                                       align='center',
+                                       font=dict(size=12)),
+                           cells=dict(values=[['Type', 'CPU Power', 'IO Power'],
+                                              *info],
+                                      align='center'),
+                           columnwidth=30,
+                           name="Server Type Info"))
+    self._server_info_fig = go.FigureWidget(fig)
+    return self._server_info_fig
 
 
   def job_status(self):

@@ -297,6 +297,37 @@ class SchedulingEnv(object):
                                          num_cpu_type, num_io_type))
     return status_reports
 
+  # if a server id is passed, return the cpu power of that server; otherwise
+  # return all cpu powers
+  def server_cpu_power(self, sid=None):
+    if sid:
+      return round(self._servers[sid].get_cpu_power(), 2)
+
+    c_powers = []
+    for s in self._servers:
+      c_powers.append(round(s.get_cpu_power(), 2))
+    return c_powers
+  # if a server id is passed, return the io power of that server; otherwise
+  # return all io powers
+  def server_io_power(self, sid=None):
+    if sid:
+      return round(self._servers[sid].get_io_power(), 2)
+
+    io_powers = []
+    for s in self._servers:
+      io_powers.append(round(s.get_io_power(), 2))
+    return io_powers
+
+
+  def server_type_info(self, sid=None):
+    if sid==None:
+      types = {}
+      for sid, s in enumerate(self._servers):
+        types[sid] = s.get_type()
+    else:
+      types = self._servers[sid].get_type()
+    return types
+
   def get_overview(self, time_span):
     total_queuing_jobs = (self._num_jobs - len(self._jobs) -
                           self._num_finished_jobs)
