@@ -111,6 +111,8 @@ class trainer():
           than this value, stop the training.
     """
     self._learner = learner
+    self._global_ep = 0
+    self._global_steps = 0
     self._episodes = episodes
     if early_stop:
       self._early_stop = early_stop_margin
@@ -136,15 +138,17 @@ class trainer():
           break
         total_update += abs(update)
         total_steps += 1
+        self._global_steps += 1
         total_r += reward
         action = self._learner.eps_policy(nq_state)
       episodes -= 1
       total_episodes += 1
+      self._global_ep += 1
       if episodes+1 and not(episodes % report_interval):
         print("Episode {:2d}, Average_updates: {:3f}, iterations: {:5d},"
-              "reward: {:3f}".format(total_episodes,
+              "reward: {:3f}".format(self._global_ep,
                                      total_update / total_steps,
-                                     total_steps,
+                                     self._global_steps,
                                      total_r))
       if abs(total_update / total_steps) < self._early_stop:
         print("Reached early stopping condtion, exiting...")
