@@ -2,7 +2,7 @@ from job_scheduling_env import SchedulingEnv
 from transition import Transition
 from replay_memory import ReplayMemory
 from collections import deque
-from utils import Collector
+from jutils import Collector
 from policy import Policy
 from samplizer import Samplizer
 from status_render import StatusRender
